@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"architect/saras-go-poc/config"
 	"architect/saras-go-poc/models"
 	"architect/saras-go-poc/resources"
-	"architect/saras-go-poc/services"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -46,7 +47,7 @@ func PostLogin(c echo.Context) error {
 	userLogin := models.Users{Email: login.Email, Password: login.Password}
 	var users models.Users
 
-	services.UserLogin(&userLogin, &users)
+	config.DB.Where(&userLogin).First(&users)
 
 	if users.ID == 0 {
 		res := setErrorResponse(LoginErrorMessage)
@@ -72,7 +73,7 @@ func PostRegister(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, res)
 	}
 	//TODO Check unique
-	services.UserRegister(&register)
+	config.DB.Create(&register)
 
 	data := resources.RegisterData{ID: register.ID, Email: register.Email, Username: register.Username, Name: register.Name, Address: register.Address, Phone: register.Phone, Image: register.Image}
 	res := resources.RegisterResponse{Status: true, Message: RegistrationSuccessMessage, Data: data}
@@ -172,32 +173,23 @@ func PostRegister(c echo.Context) error {
 // 	UserID := c.Param("user_id")
 // }
 
-func UserList(c echo.Context) error {
+func GetUsers(c echo.Context) error {
 	id := c.Param("id")
-	users := services.UserList(id)
+	var users []models.Users
+
+	if user_id, err := strconv.Atoi(id); err != nil {
+		config.DB.Find(&users)
+	} else {
+		config.DB.Find(&users, user_id)
+	}
+
 	if len(users) == 0 {
 		return c.JSON(http.StatusNoContent, "No Content")
 	}
 	if len(users) == 1 {
-		return c.JSON(http.StatusOK, users)
+		return c.JSON(http.StatusOK, users) // Map to response & one data
 	}
-	return c.JSON(http.StatusOK, users)
-}
-
-func GetUsers(c echo.Context) error {
-	id := c.Param("id")
-
-	users := []models.Users{}
-	services.GetUsers(&users, id)
-
-	// if len(users) == 1 {
-	// 	// Map to response & one data
-	// }
-	// else {
-	// 	// Map to response & data
-	// }
-
-	return c.JSON(http.StatusOK, users)
+	return c.JSON(http.StatusOK, users) // Map to response & data
 }
 
 // func PostWishlist(c echo.Context) {

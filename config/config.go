@@ -15,7 +15,6 @@ import (
 var DB *gorm.DB
 
 func Init(dotenvPath ...string) {
-
 	var conn *gorm.DB
 	var err error
 

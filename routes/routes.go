@@ -52,8 +52,6 @@ func Init() *echo.Echo {
 
 		api.GET("/users", handlers.GetUsers)
 		api.GET("/users/:id", handlers.GetUsers)
-		api.GET("/userlist", handlers.UserList)
-		api.GET("/userlist/:id", handlers.UserList)
 
 		// api.POST("/wishlist", handlers.PostWishlist)
 		// api.GET("/wishlist/:id", handlers.GetWishlist)

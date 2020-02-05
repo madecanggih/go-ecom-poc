@@ -1,29 +1,36 @@
-package handler
+package tests
 
 import (
+	"architect/saras-go-poc/handlers"
+	"architect/saras-go-poc/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func TestGetUsers(t *testing.T) {
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/1.0.0/users", nil)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-	println(c)
+type MockedObject struct {
+	mock.Mock
 }
 
-func TestGetUsersId(t *testing.T) {
+func (m *MockedObject) GetUsers(id string) []models.Users {
+	users := []models.Users{}
+	return users
+}
+
+func TestGetUser(t *testing.T) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/1.0.0/users", nil)
+
+	req := httptest.NewRequest(echo.GET, "/api/v1/users", nil)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
+
 	c := e.NewContext(req, rec)
-	c.SetPath("/:id")
-	c.SetParamNames("id")
-	c.SetParamValues("1")
-	println(c)
+
+	if assert.NoError(t, handlers.GetUsers(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+	}
 }
