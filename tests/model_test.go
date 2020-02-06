@@ -16,7 +16,7 @@ func TestFindByID(t *testing.T) {
 	var cols []string = []string{"id", "name"}
 	mock.ExpectQuery("SELECT *").WillReturnRows(sqlmock.NewRows(cols).AddRow(1, "foobar"))
 
-	um := models.NewUserModel(db)
+	um := models.NewDB(db)
 	u := um.FindByID(1)
 
 	expect := models.Users{

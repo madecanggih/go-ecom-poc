@@ -12,12 +12,14 @@ func Init() *echo.Echo {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
-	h := handlers.NewHandler(models.NewUserModel(config.DB))
+
+	h := handlers.NewHandler(models.NewDB(config.DB))
+
 	api := e.Group("/api/v1")
 	{
 		api.GET("/index", h.GetIndex)
-		api.POST("/auth/login", handlers.PostLogin)
-		api.POST("/auth/register", handlers.PostRegister)
+		// api.POST("/auth/login", handlers.PostLogin)
+		// api.POST("/auth/register", handlers.PostRegister)
 
 		// api.GET("/book/checkout/:user_id", handlers.GetCheckout)
 		// api.POST("/book/checkout/:user_id", handlers.PostCheckout)

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"architect/saras-go-poc/config"
 	"architect/saras-go-poc/models"
 	"architect/saras-go-poc/resources"
 	"net/http"
@@ -24,24 +23,23 @@ type resultLists struct {
 }
 
 type handler struct {
-	UserModel models.UserModelImpl
+	Database models.DBImpl
 }
 
-func NewHandler(u models.UserModelImpl) *handler {
+func NewHandler(u models.DBImpl) *handler {
 	return &handler{u}
 }
 
 func (h *handler) GetIndex(c echo.Context) error {
-	lists := h.UserModel.FindAll()
-	u := &resultLists{lists}
+	users := h.Database.FindAll()
 
-	return c.JSON(200, u)
+	return c.JSON(200, users)
 }
 
 func (h *handler) GetDetail(c echo.Context) error {
 	id := c.Param("id")
 	user_id, _ := strconv.Atoi(id)
-	u := h.UserModel.FindByID(user_id)
+	u := h.Database.FindByID(user_id)
 	return c.JSON(http.StatusOK, u)
 }
 
@@ -49,62 +47,62 @@ func setErrorResponse(message string) resources.ErrorResponse {
 	return resources.ErrorResponse{Status: false, Message: message}
 }
 
-func PostLogin(c echo.Context) error {
-	login := new(models.Login)
+// func PostLogin(c echo.Context) error {
+// 	login := new(models.Login)
 
-	if err := c.Bind(&login); err != nil {
-		res := setErrorResponse(InternalServerErrorMessage)
-		return c.JSON(http.StatusInternalServerError, res)
-	}
+// 	if err := c.Bind(&login); err != nil {
+// 		res := setErrorResponse(InternalServerErrorMessage)
+// 		return c.JSON(http.StatusInternalServerError, res)
+// 	}
 
-	if login.Email == "" {
-		res := setErrorResponse(EmailRequiredMessage)
-		return c.JSON(http.StatusBadRequest, res)
-	}
+// 	if login.Email == "" {
+// 		res := setErrorResponse(EmailRequiredMessage)
+// 		return c.JSON(http.StatusBadRequest, res)
+// 	}
 
-	if login.Password == "" {
-		res := setErrorResponse(PasswordRequiredMessage)
-		return c.JSON(http.StatusBadRequest, res)
-	}
+// 	if login.Password == "" {
+// 		res := setErrorResponse(PasswordRequiredMessage)
+// 		return c.JSON(http.StatusBadRequest, res)
+// 	}
 
-	// TODO: Hash the pass
-	//login.Password += "hash"
+// 	// TODO: Hash the pass
+// 	//login.Password += "hash"
 
-	userLogin := models.Users{Email: login.Email, Password: login.Password}
-	var users models.Users
+// 	userLogin := models.Users{Email: login.Email, Password: login.Password}
+// 	var users models.Users
 
-	config.DB.Where(&userLogin).First(&users)
+// 	config.DB.Where(&userLogin).First(&users)
 
-	if users.ID == 0 {
-		res := setErrorResponse(LoginErrorMessage)
-		return c.JSON(http.StatusUnauthorized, res)
-	}
+// 	if users.ID == 0 {
+// 		res := setErrorResponse(LoginErrorMessage)
+// 		return c.JSON(http.StatusUnauthorized, res)
+// 	}
 
-	token, err := generateToken(users.ID, users.Name)
-	if err != nil {
-		res := setErrorResponse(InternalServerErrorMessage)
-		return c.JSON(http.StatusInternalServerError, res)
-	}
+// 	token, err := generateToken(users.ID, users.Name)
+// 	if err != nil {
+// 		res := setErrorResponse(InternalServerErrorMessage)
+// 		return c.JSON(http.StatusInternalServerError, res)
+// 	}
 
-	data := resources.LoginData{ID: users.ID, Email: users.Email, Username: users.Username, Name: users.Name, Address: users.Address, Phone: users.Phone, Image: users.Image, Token: token}
-	res := resources.LoginResponse{Status: true, Message: LoginSuccessMessage, Data: data}
+// 	data := resources.LoginData{ID: users.ID, Email: users.Email, Username: users.Username, Name: users.Name, Address: users.Address, Phone: users.Phone, Image: users.Image, Token: token}
+// 	res := resources.LoginResponse{Status: true, Message: LoginSuccessMessage, Data: data}
 
-	return c.JSON(http.StatusOK, res)
-}
+// 	return c.JSON(http.StatusOK, res)
+// }
 
-func PostRegister(c echo.Context) error {
-	var register models.Users
-	if err := c.Bind(&register); err != nil {
-		res := setErrorResponse(InternalServerErrorMessage)
-		return c.JSON(http.StatusInternalServerError, res)
-	}
-	//TODO Check unique
-	config.DB.Create(&register)
+// func PostRegister(c echo.Context) error {
+// 	var register models.Users
+// 	if err := c.Bind(&register); err != nil {
+// 		res := setErrorResponse(InternalServerErrorMessage)
+// 		return c.JSON(http.StatusInternalServerError, res)
+// 	}
+// 	//TODO Check unique
+// 	config.DB.Create(&register)
 
-	data := resources.RegisterData{ID: register.ID, Email: register.Email, Username: register.Username, Name: register.Name, Address: register.Address, Phone: register.Phone, Image: register.Image}
-	res := resources.RegisterResponse{Status: true, Message: RegistrationSuccessMessage, Data: data}
-	return c.JSON(http.StatusOK, res)
-}
+// 	data := resources.RegisterData{ID: register.ID, Email: register.Email, Username: register.Username, Name: register.Name, Address: register.Address, Phone: register.Phone, Image: register.Image}
+// 	res := resources.RegisterResponse{Status: true, Message: RegistrationSuccessMessage, Data: data}
+// 	return c.JSON(http.StatusOK, res)
+// }
 
 // func GetCheckout(c echo.Context) {
 // 	userID := c.Param("user_id")
@@ -199,24 +197,24 @@ func PostRegister(c echo.Context) error {
 // 	UserID := c.Param("user_id")
 // }
 
-func GetUsers(c echo.Context) error {
-	id := c.Param("id")
-	var users []models.Users
+// func GetUsers(c echo.Context) error {
+// 	id := c.Param("id")
+// 	var users []models.Users
 
-	if user_id, err := strconv.Atoi(id); err != nil {
-		config.DB.Find(&users)
-	} else {
-		config.DB.Find(&users, user_id)
-	}
+// 	if user_id, err := strconv.Atoi(id); err != nil {
+// 		config.DB.Find(&users)
+// 	} else {
+// 		config.DB.Find(&users, user_id)
+// 	}
 
-	if len(users) == 0 {
-		return c.JSON(http.StatusNoContent, "No Content")
-	}
-	if len(users) == 1 {
-		return c.JSON(http.StatusOK, users) // Map to response & one data
-	}
-	return c.JSON(http.StatusOK, users) // Map to response & data
-}
+// 	if len(users) == 0 {
+// 		return c.JSON(http.StatusNoContent, "No Content")
+// 	}
+// 	if len(users) == 1 {
+// 		return c.JSON(http.StatusOK, users) // Map to response & one data
+// 	}
+// 	return c.JSON(http.StatusOK, users) // Map to response & data
+// }
 
 // func PostWishlist(c echo.Context) {
 

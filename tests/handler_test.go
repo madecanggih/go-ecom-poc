@@ -5,6 +5,7 @@ import (
 	"architect/saras-go-poc/models"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -42,10 +43,12 @@ func TestGetIndex(t *testing.T) {
 	u := &UserModelStub{}
 	h := handlers.NewHandler(u)
 
-	var expected = `{"users":[{"id": 100, "name": "foo"}]}`
+	var expected = `[{"id":100,"email":"","username":"","name":"foo","address":"","phone":"","password":"","image":""}]`
 
 	if assert.NoError(t, h.GetIndex(c)) {
+		var actual = strings.TrimSpace(rec.Body.String())
+
 		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Equal(t, expected, rec.Body.String())
+		assert.Equal(t, expected, actual)
 	}
 }
