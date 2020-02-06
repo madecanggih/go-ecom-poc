@@ -19,6 +19,32 @@ const EmailRequiredMessage string = "Email is required"
 const PasswordRequiredMessage string = "Password is required"
 const LoginErrorMessage string = "Password is not correct or User is not registered"
 
+type resultLists struct {
+	Users []models.Users `json:"users"`
+}
+
+type handler struct {
+	UserModel models.UserModelImpl
+}
+
+func NewHandler(u models.UserModelImpl) *handler {
+	return &handler{u}
+}
+
+func (h *handler) GetIndex(c echo.Context) error {
+	lists := h.UserModel.FindAll()
+	u := &resultLists{lists}
+
+	return c.JSON(200, u)
+}
+
+func (h *handler) GetDetail(c echo.Context) error {
+	id := c.Param("id")
+	user_id, _ := strconv.Atoi(id)
+	u := h.UserModel.FindByID(user_id)
+	return c.JSON(http.StatusOK, u)
+}
+
 func setErrorResponse(message string) resources.ErrorResponse {
 	return resources.ErrorResponse{Status: false, Message: message}
 }

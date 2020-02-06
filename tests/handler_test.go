@@ -9,28 +9,43 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type MockedObject struct {
-	mock.Mock
+type (
+	UserModelStub struct{}
+)
+
+func (u *UserModelStub) FindByID(id int) models.Users {
+	return models.Users{
+		ID:   1,
+		Name: "foo",
+	}
 }
 
-func (m *MockedObject) GetUsers(id string) []models.Users {
+func (u *UserModelStub) FindAll() []models.Users {
 	users := []models.Users{}
+	users = append(users, models.Users{
+		ID:   100,
+		Name: "foo",
+	})
 	return users
 }
 
-func TestGetUser(t *testing.T) {
+func TestGetIndex(t *testing.T) {
 	e := echo.New()
 
-	req := httptest.NewRequest(echo.GET, "/api/v1/users", nil)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req := httptest.NewRequest(echo.GET, "/index", nil)
 	rec := httptest.NewRecorder()
 
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, handlers.GetUsers(c)) {
+	u := &UserModelStub{}
+	h := handlers.NewHandler(u)
+
+	var expected = `{"users":[{"id": 100, "name": "foo"}]}`
+
+	if assert.NoError(t, h.GetIndex(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, expected, rec.Body.String())
 	}
 }

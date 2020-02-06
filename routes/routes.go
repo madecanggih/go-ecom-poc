@@ -1,8 +1,9 @@
 package routes
 
 import (
+	"architect/saras-go-poc/config"
 	"architect/saras-go-poc/handlers"
-
+	"architect/saras-go-poc/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -11,9 +12,10 @@ func Init() *echo.Echo {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
-
+	h := handlers.NewHandler(models.NewUserModel(config.DB))
 	api := e.Group("/api/v1")
 	{
+		api.GET("/index", h.GetIndex)
 		api.POST("/auth/login", handlers.PostLogin)
 		api.POST("/auth/register", handlers.PostRegister)
 

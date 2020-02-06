@@ -4,8 +4,30 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 )
 
+type (
+	UserModelImpl interface {
+		FindByID(id int) Users
+		FindAll() []Users
+	}
+
+	Users struct {
+		ID       uint   `json:"id" gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
+		Email    string `json:"email" gorm:"type:varchar(255);"`
+		Username string `json:"username" gorm:"type:varchar(255);"`
+		Name     string `json:"name" gorm:"type:varchar(255);"`
+		Address  string `json:"address" gorm:"type:varchar(255);"`
+		Phone    string `json:"phone" gorm:"type:varchar(255);"`
+		Password string `json:"password" gorm:"type:varchar(255);"`
+		Image    string `json:"image" gorm:"type:varchar(255);"`
+	}
+
+	UserModel struct {
+		db *gorm.DB
+	}
+)
 type Carts struct {
 	ID        uint   `json:"id" gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
 	Status    string `json:"status" gorm:"type:varchar(255);"`
@@ -65,19 +87,37 @@ type Stores struct {
 	Image       string `json:"image"`
 }
 
-type Users struct {
-	ID       uint   `json:"id" gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
-	Email    string `json:"email" gorm:"type:varchar(255);"`
-	Username string `json:"username" gorm:"type:varchar(255);"`
-	Name     string `json:"name" gorm:"type:varchar(255);"`
-	Address  string `json:"address" gorm:"type:varchar(255);"`
-	Phone    string `json:"phone" gorm:"type:varchar(255);"`
-	Password string `json:"password" gorm:"type:varchar(255);"`
-	Image    string `json:"image" gorm:"type:varchar(255);"`
-}
+// type Users struct {
+// 	ID       uint   `json:"id" gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
+// 	Email    string `json:"email" gorm:"type:varchar(255);"`
+// 	Username string `json:"username" gorm:"type:varchar(255);"`
+// 	Name     string `json:"name" gorm:"type:varchar(255);"`
+// 	Address  string `json:"address" gorm:"type:varchar(255);"`
+// 	Phone    string `json:"phone" gorm:"type:varchar(255);"`
+// 	Password string `json:"password" gorm:"type:varchar(255);"`
+// 	Image    string `json:"image" gorm:"type:varchar(255);"`
+// }
 
 type Wishilists struct {
 	ID        uint `json:"id" gorm:"PRIMARY_KEY;AUTO_INCREMENT"`
 	UserID    uint `json:"user_id"`
 	ProductID uint `json:"product_id"`
+}
+
+func NewUserModel(db *gorm.DB) *UserModel {
+	return &UserModel{db}
+}
+
+func (u *UserModel) FindByID(id int) Users {
+	users := Users{}
+	u.db.Find(&users, id)
+
+	return users
+}
+
+func (u *UserModel) FindAll() []Users {
+	users := []Users{}
+	u.db.Find(&users)
+
+	return users
 }
