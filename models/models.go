@@ -5,12 +5,12 @@ import (
 )
 
 type (
-	DBImpl interface {
+	DBInterface interface {
 		FindByID(id int) Users
 		FindAll() []Users
 	}
 
-	Database struct {
+	DBImplementation struct {
 		db *gorm.DB
 	}
 )
@@ -91,18 +91,18 @@ type Users struct {
 // 	ProductID uint `json:"product_id"`
 // }
 
-func NewDB(db *gorm.DB) *Database {
-	return &Database{db}
+func NewDB(db *gorm.DB) *DBImplementation {
+	return &DBImplementation{db}
 }
 
-func (d *Database) FindByID(id int) Users {
+func (d *DBImplementation) FindByID(id int) Users {
 	users := Users{}
 	d.db.Find(&users, id)
 
 	return users
 }
 
-func (d *Database) FindAll() []Users {
+func (d *DBImplementation) FindAll() []Users {
 	users := []Users{}
 	d.db.Find(&users)
 

@@ -12,9 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type (
-	UserModelStub struct{}
-)
+type UserModelStub struct{}
 
 func (u *UserModelStub) FindByID(id int) models.Users {
 	return models.Users{
@@ -24,11 +22,17 @@ func (u *UserModelStub) FindByID(id int) models.Users {
 }
 
 func (u *UserModelStub) FindAll() []models.Users {
-	users := []models.Users{}
-	users = append(users, models.Users{
-		ID:   100,
-		Name: "foo",
-	})
+	users := []models.Users{
+		models.Users{
+			ID:   1,
+			Name: "foo",
+		},
+		models.Users{
+			ID:   2,
+			Name: "bar",
+		},
+	}
+
 	return users
 }
 
@@ -43,9 +47,30 @@ func TestGetIndex(t *testing.T) {
 	u := &UserModelStub{}
 	h := handlers.NewHandler(u)
 
-	var expected = `[{"id":100,"email":"","username":"","name":"foo","address":"","phone":"","password":"","image":""}]`
+	var expected = `[{"id":1,"email":"","username":"","name":"foo","address":"","phone":"","password":"","image":""},{"id":2,"email":"","username":"","name":"bar","address":"","phone":"","password":"","image":""}]`
 
 	if assert.NoError(t, h.GetIndex(c)) {
+		var actual = strings.TrimSpace(rec.Body.String())
+
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, expected, actual)
+	}
+}
+
+func TestGetDetail(t *testing.T) {
+	e := echo.New()
+
+	req := httptest.NewRequest(echo.GET, "/index:1", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+
+	u := &UserModelStub{}
+	h := handlers.NewHandler(u)
+
+	var expected = `{"id":1,"email":"","username":"","name":"foo","address":"","phone":"","password":"","image":""}`
+
+	if assert.NoError(t, h.GetDetail(c)) {
 		var actual = strings.TrimSpace(rec.Body.String())
 
 		assert.Equal(t, http.StatusOK, rec.Code)

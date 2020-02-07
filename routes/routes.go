@@ -18,6 +18,7 @@ func Init() *echo.Echo {
 	api := e.Group("/api/v1")
 	{
 		api.GET("/index", h.GetIndex)
+		api.GET("/index/:id", h.GetDetail)
 		// api.POST("/auth/login", handlers.PostLogin)
 		// api.POST("/auth/register", handlers.PostRegister)
 

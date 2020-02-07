@@ -3,7 +3,6 @@ package handlers
 import (
 	"architect/saras-go-poc/models"
 	"architect/saras-go-poc/resources"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -18,29 +17,25 @@ const EmailRequiredMessage string = "Email is required"
 const PasswordRequiredMessage string = "Password is required"
 const LoginErrorMessage string = "Password is not correct or User is not registered"
 
-type resultLists struct {
-	Users []models.Users `json:"users"`
-}
-
 type handler struct {
-	Database models.DBImpl
-}
-
-func NewHandler(u models.DBImpl) *handler {
-	return &handler{u}
+	do models.DBInterface
 }
 
 func (h *handler) GetIndex(c echo.Context) error {
-	users := h.Database.FindAll()
+	users := h.do.FindAll()
 
 	return c.JSON(200, users)
 }
 
 func (h *handler) GetDetail(c echo.Context) error {
 	id := c.Param("id")
-	user_id, _ := strconv.Atoi(id)
-	u := h.Database.FindByID(user_id)
-	return c.JSON(http.StatusOK, u)
+	userID, _ := strconv.Atoi(id)
+	user := h.do.FindByID(userID)
+	return c.JSON(200, user)
+}
+
+func NewHandler(dbi models.DBInterface) *handler {
+	return &handler{dbi}
 }
 
 func setErrorResponse(message string) resources.ErrorResponse {
