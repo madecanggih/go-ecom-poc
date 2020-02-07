@@ -1,7 +1,6 @@
-package config
+package models
 
 import (
-	"architect/saras-go-poc/models"
 	"fmt"
 	"log"
 	"os"
@@ -12,9 +11,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type (
+	DBInterface interface {
+		SelectAll() []Users
+		SelectById(id int) Users
+	}
+
+	DBImplementation struct {
+		db *gorm.DB
+	}
+)
+
 var DB *gorm.DB
 
-func Init(dotenvPath ...string) {
+func InitDB(dotenvPath ...string) {
 	var conn *gorm.DB
 	var err error
 
@@ -50,11 +60,29 @@ func Init(dotenvPath ...string) {
 		log.Panic(err.Error())
 	}
 
-	conn.AutoMigrate(&models.Carts{}, &models.Categories{}, &models.Invoices{}, &models.Products{}, &models.Promos{}, &models.Stores{}, &models.Users{}, &models.Wishilists{})
+	conn.AutoMigrate(&Carts{}, &Categories{}, &Invoices{}, &Products{}, &Promos{}, &Stores{}, &Users{}, &Wishilists{})
 
 	DB = conn
 }
 
-func Close() {
+func CloseDB() {
 	DB.Close()
+}
+
+func NewDB(db *gorm.DB) *DBImplementation {
+	return &DBImplementation{db}
+}
+
+func (d *DBImplementation) SelectById(id int) Users {
+	users := Users{}
+	d.db.Find(&users, id)
+
+	return users
+}
+
+func (d *DBImplementation) SelectAll() []Users {
+	users := []Users{}
+	d.db.Find(&users)
+
+	return users
 }

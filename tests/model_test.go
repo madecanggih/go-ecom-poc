@@ -8,9 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFindByID(t *testing.T) {
-	mocket.Catcher.Logging = true
-
+func TestSelectById(t *testing.T) {
 	db := MockDB(t)
 	defer db.Close()
 
@@ -18,7 +16,7 @@ func TestFindByID(t *testing.T) {
 	mocket.Catcher.Reset().NewMock().WithQuery(`SELECT * FROM "users"  WHERE ("users"."id" = 1)`).WithReply(mockReply)
 
 	um := models.NewDB(db)
-	u := um.FindByID(1)
+	u := um.SelectById(1)
 
 	expect := models.Users{
 		ID:   1,
@@ -27,7 +25,7 @@ func TestFindByID(t *testing.T) {
 	assert.Equal(t, expect, u)
 }
 
-func TestFindAll(t *testing.T) {
+func TestSelectAll(t *testing.T) {
 	db := MockDB(t)
 	defer db.Close()
 
@@ -35,7 +33,7 @@ func TestFindAll(t *testing.T) {
 	mocket.Catcher.Reset().NewMock().WithQuery(`SELECT * FROM "users"`).WithReply(mockReply)
 
 	um := models.NewDB(db)
-	u := um.FindAll()
+	u := um.SelectAll()
 
 	expect := []models.Users{
 		models.Users{

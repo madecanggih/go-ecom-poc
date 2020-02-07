@@ -1,19 +1,18 @@
 package routes
 
 import (
-	"architect/saras-go-poc/config"
 	"architect/saras-go-poc/handlers"
 	"architect/saras-go-poc/models"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Init() *echo.Echo {
+func InitRoutes() *echo.Echo {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.CORS())
 
-	h := handlers.NewHandler(models.NewDB(config.DB))
+	h := handlers.NewHandler(models.NewDB(models.DB))
 
 	api := e.Group("/api/v1")
 	{
@@ -55,8 +54,8 @@ func Init() *echo.Echo {
 
 		// api.GET("/trolley/:user_id", handlers.GetTrolley)
 
-		api.GET("/users", handlers.GetUsers)
-		api.GET("/users/:id", handlers.GetUsers)
+		// api.GET("/users", handlers.GetUsers)
+		// api.GET("/users/:id", handlers.GetUsers)
 
 		// api.POST("/wishlist", handlers.PostWishlist)
 		// api.GET("/wishlist/:id", handlers.GetWishlist)

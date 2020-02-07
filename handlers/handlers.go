@@ -22,7 +22,7 @@ type handler struct {
 }
 
 func (h *handler) GetIndex(c echo.Context) error {
-	users := h.do.FindAll()
+	users := h.do.SelectAll()
 
 	return c.JSON(200, users)
 }
@@ -30,7 +30,7 @@ func (h *handler) GetIndex(c echo.Context) error {
 func (h *handler) GetDetail(c echo.Context) error {
 	id := c.Param("id")
 	userID, _ := strconv.Atoi(id)
-	user := h.do.FindByID(userID)
+	user := h.do.SelectById(userID)
 	return c.JSON(200, user)
 }
 

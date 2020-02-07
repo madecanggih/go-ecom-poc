@@ -1,7 +1,7 @@
 package main
 
 import (
-	"architect/saras-go-poc/config"
+	"architect/saras-go-poc/models"
 	"architect/saras-go-poc/routes"
 	"log"
 	"os"
@@ -10,10 +10,10 @@ import (
 )
 
 func main() {
-	config.Init()
-	defer config.Close()
+	models.InitDB()
+	defer models.CloseDB()
 
-	e := routes.Init()
+	e := routes.InitRoutes()
 
 	err := godotenv.Load()
 	if err != nil {

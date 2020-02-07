@@ -14,14 +14,14 @@ import (
 
 type UserModelStub struct{}
 
-func (u *UserModelStub) FindByID(id int) models.Users {
+func (u *UserModelStub) SelectById(id int) models.Users {
 	return models.Users{
 		ID:   1,
 		Name: "foo",
 	}
 }
 
-func (u *UserModelStub) FindAll() []models.Users {
+func (u *UserModelStub) SelectAll() []models.Users {
 	users := []models.Users{
 		models.Users{
 			ID:   1,
