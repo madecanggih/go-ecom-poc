@@ -60,7 +60,7 @@ func TestGetIndex(t *testing.T) {
 func TestGetDetail(t *testing.T) {
 	e := echo.New()
 
-	req := httptest.NewRequest(echo.GET, "/index:1", nil)
+	req := httptest.NewRequest(echo.GET, "/index/:1", nil)
 	rec := httptest.NewRecorder()
 
 	c := e.NewContext(req, rec)
